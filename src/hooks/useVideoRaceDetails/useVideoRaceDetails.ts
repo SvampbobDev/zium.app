@@ -97,6 +97,10 @@ export const useVideoRaceDetails = (raceId: string): StreamsState => {
     return debugLiveStreams;
   }
 
+  if (raceId === "__DEBUG_SINGLE__") {
+    return debugSingleStream;
+  }
+
   return streams;
 };
 
@@ -422,6 +426,24 @@ const debugLiveStreams: StreamsState & { state: "done" } = {
     },
     playbackOffsets: {
       f1: {},
+    },
+  },
+};
+
+const debugSingleStream: StreamsState & { state: "done" } = {
+  state: "done",
+  data: {
+    ...debugLiveStreams.data,
+    streams: {
+      defaultStreams: debugLiveStreams.data.streams.defaultStreams,
+      driverStreams: [],
+      driverTrackerStream: null,
+      dataChannelStream: null,
+    },
+    raceInfo: {
+      ...debugLiveStreams.data.raceInfo,
+      title: "Weekend Warm-Up",
+      genre: "weekend warm-up",
     },
   },
 };

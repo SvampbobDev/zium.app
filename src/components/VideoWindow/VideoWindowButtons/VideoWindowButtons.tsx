@@ -2,7 +2,7 @@ import cn from "classnames";
 import { SpeakerWaveIcon, XMarkIcon, GlobeEuropeAfricaIcon } from "@heroicons/react/20/solid";
 import { ReactNode } from "react";
 import { GridLayoutFillMode } from "../../../views/Viewer/hooks/useViewerState/useViewerState.utils";
-import { Button } from "../../Button/Button";
+import { Button, ButtonVariant } from "../../Button/Button";
 import {
   AspectRatioOffIcon,
   AspectRatioOnIcon,
@@ -72,10 +72,11 @@ export const VideoWindowButtonsUpdateFillMode = (props: VideoWindowButtonsUpdate
 interface VideoWindowButtonsToggleClosedCaptionsProps {
   toggleClosedCaptions: () => void;
   areClosedCaptionsOn: boolean;
+  variant?: ButtonVariant;
 }
 export const VideoWindowButtonsToggleClosedCaptions = (props: VideoWindowButtonsToggleClosedCaptionsProps) => (
   <Button
-    variant="SecondaryInverted"
+    variant={props.variant ?? "SecondaryInverted"}
     onClick={props.toggleClosedCaptions}
     iconLeft={props.areClosedCaptionsOn ? ClosedCaptionsOnIcon : ClosedCaptionsOffIcon}
     aria-label={props.areClosedCaptionsOn ? "Turn off closed captions" : "Turn on closed captions"}
@@ -86,6 +87,7 @@ interface VideoWindowButtonsSetClosedCaptionsProps {
   setClosedCaptions: () => void;
   availableClosedCaptions: DropdownSectionElement[];
   areClosedCaptionsOn: boolean;
+  variant?: ButtonVariant;
 }
 export const VideoWindowButtonsSetClosedCaptions = (props: VideoWindowButtonsSetClosedCaptionsProps) => {
   const { preventHiding } = useViewerUIVisibility();
@@ -104,7 +106,7 @@ export const VideoWindowButtonsSetClosedCaptions = (props: VideoWindowButtonsSet
             ref={setRef}
             iconLeft={props.areClosedCaptionsOn ? ClosedCaptionsOnIcon : ClosedCaptionsOffIcon}
             isPressed={isOpen}
-            variant="SecondaryInverted"
+            variant={props.variant ?? "SecondaryInverted"}
             onClick={toggleOpen}
             aria-label="Choose closed captions track"
           />
@@ -130,6 +132,7 @@ export const VideoWindowButtonsOnAudioFocusClick = (props: VideoWindowButtonsOnA
 
 interface VideoWindowButtonsSetVideoTrackProps {
   availableVideoTracks: DropdownOptions;
+  variant?: ButtonVariant;
 }
 export const VideoWindowButtonsSetVideoTrack = (props: VideoWindowButtonsSetVideoTrackProps) => {
   const { preventHiding } = useViewerUIVisibility();
@@ -148,7 +151,7 @@ export const VideoWindowButtonsSetVideoTrack = (props: VideoWindowButtonsSetVide
             ref={setRef}
             iconLeft={GlobeEuropeAfricaIcon}
             isPressed={isOpen}
-            variant="SecondaryInverted"
+            variant={props.variant ?? "SecondaryInverted"}
             onClick={toggleOpen}
             aria-label="Choose video track"
           />

@@ -22,10 +22,14 @@ import { PlayerShell } from "../../components/Player/PlayerShell";
 import { useGrid } from "./hooks/useGrid";
 import styles from "./Viewer.module.scss";
 import { BackgroundDots } from "./BackgroundDots/BackgroundDots";
+import { isSingleStreamEvent } from "./Viewer.utils";
 
-const { Component: Viewer, preload: preloadViewer } = lazyWithPreload(() => import("./Viewer"));
+const { Component: Viewer, preload: preloadGridViewer } = lazyWithPreload(() => import("./Viewer"));
+const { Component: SingleStreamViewer, preload: preloadSingleStreamViewer } = lazyWithPreload(
+  () => import("./SingleStreamViewer/SingleStreamViewer"),
+);
 
-export { preloadViewer };
+export const preloadViewer = () => Promise.all([preloadGridViewer(), preloadSingleStreamViewer()]);
 export const ViewerWithState = () => {
   const { raceId } = useParams();
   const currentTier = useCurrentTier();
@@ -64,14 +68,23 @@ export const ViewerWithState = () => {
               [GLOBAL_UI_VISIBILITY_CLASS_NAME]: viewerUIVisibilityState.isUIVisible,
             })}
           >
-            <Viewer
-              streams={state.data.streams}
-              season={state.data.season}
-              isLive={state.data.isLive}
-              raceInfo={state.data.raceInfo}
-              playbackOffsets={state.data.playbackOffsets}
-              raceId={raceId}
-            />
+            {isSingleStreamEvent(state.data.streams) ? (
+              <SingleStreamViewer
+                streams={state.data.streams}
+                isLive={state.data.isLive}
+                raceInfo={state.data.raceInfo}
+                raceId={raceId}
+              />
+            ) : (
+              <Viewer
+                streams={state.data.streams}
+                season={state.data.season}
+                isLive={state.data.isLive}
+                raceInfo={state.data.raceInfo}
+                playbackOffsets={state.data.playbackOffsets}
+                raceId={raceId}
+              />
+            )}
           </div>
         </UserOffsetsProvider>
       </Suspense>

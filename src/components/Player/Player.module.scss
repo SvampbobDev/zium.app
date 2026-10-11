@@ -125,6 +125,14 @@
   gap: 8px;
 }
 
+.extraControlsWithoutPlayer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
 .grabbingWrapper {
   z-index: var(--z-index-player-grabbing-container);
   position: absolute;

@@ -1,4 +1,4 @@
-import { DropdownSection } from "../../Dropdown/Dropdown";
+import { DropdownSection } from "../../components/Dropdown/Dropdown";
 
 export const getTrackPrettyName = (lang: string, fallback: string) => {
   if (lang === "eng") {

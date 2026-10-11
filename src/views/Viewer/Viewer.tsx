@@ -416,15 +416,17 @@ export const Viewer = memo(({ streams, season, isLive, raceInfo, playbackOffsets
           volume={internalVolume}
           isMuted={isMuted}
           setIsMuted={setIsMuted}
-          usedWindows={usedWindows}
-          createWindow={createWindow}
-          loadLayout={loadLayout}
-          duplicateLayout={duplicateLayout}
-          renameLayout={renameLayout}
-          deleteLayout={deleteLayout}
-          viewerState={viewerState}
           isPaused={areVideosPaused}
-          hasUsedAllStreams={usedWindows.length >= availableDrivers.length + globalFeeds.length}
+          layoutControls={{
+            usedWindows,
+            createWindow,
+            loadLayout,
+            duplicateLayout,
+            renameLayout,
+            deleteLayout,
+            viewerState,
+            hasUsedAllStreams: usedWindows.length >= availableDrivers.length + globalFeeds.length,
+          }}
         />
         <GlobalShortcutsSnackbar />
       </div>

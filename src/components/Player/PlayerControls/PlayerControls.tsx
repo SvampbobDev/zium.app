@@ -1,6 +1,6 @@
 import { PauseIcon, PlayIcon } from "@heroicons/react/20/solid";
 import cn from "classnames";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { useStateWithRef } from "../../../hooks/useStateWithRef/useStateWithRef";
 import { Button } from "../../Button/Button";
 import { ArrowLeft30Icon, ArrowRight30Icon } from "../../CustomIcons/CustomIcons";
@@ -17,11 +17,19 @@ interface PlayerControlsProps {
   setVolume: (newVolume: number) => void;
   isMuted: boolean;
   setIsMuted: (newIsMuted: boolean) => void;
+  extraControls?: ReactNode;
 }
 
 const OVERLAY_TIMEOUT_DELAY = 100;
 
-export const PlayerControls = ({ playerRef, setVolume, volume, isMuted, setIsMuted }: PlayerControlsProps) => {
+export const PlayerControls = ({
+  playerRef,
+  setVolume,
+  volume,
+  isMuted,
+  setIsMuted,
+  extraControls,
+}: PlayerControlsProps) => {
   const { video } = playerRef;
   const [isReady, setIsReady] = useState(video.readyState >= 3);
 
@@ -51,6 +59,7 @@ export const PlayerControls = ({ playerRef, setVolume, volume, isMuted, setIsMut
         volume={volume}
         isMuted={isMuted}
         setIsMuted={setIsMuted}
+        extraControls={extraControls}
       />
     </div>
   );

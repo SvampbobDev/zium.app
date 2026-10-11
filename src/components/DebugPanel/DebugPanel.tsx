@@ -269,6 +269,9 @@ const DebugRaceSettings = ({ closePanel }: DebugPanelContentsProps) => {
         <Button variant={"Secondary"} as={Link} to="/race/__DEBUG__" onClick={closePanel}>
           Open debug live stream
         </Button>
+        <Button variant={"Secondary"} as={Link} to="/race/__DEBUG_SINGLE__" onClick={closePanel}>
+          Open debug single stream
+        </Button>
         <Button
           variant={"Secondary"}
           onClick={() => {

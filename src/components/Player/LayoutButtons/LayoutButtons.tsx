@@ -21,7 +21,7 @@ import styles from "./LayoutButtons.module.scss";
 import { useLayoutsDropdownHotkeys, useLayoutsDropdownState } from "./LayoutButtons.hooks";
 import { LayoutCaption } from "./LayoutCaption/LayoutCaption";
 
-interface LayoutButtonsProps {
+export interface LayoutButtonsProps {
   usedWindows: string[];
   createWindow: (newWindow: GridWindow, dimensions: Dimensions) => void;
   loadLayout: (selectedLayoutIndex: number) => void;

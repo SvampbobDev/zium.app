@@ -2,6 +2,13 @@ import { DriverStreamInfo, StreamsStateStreamsData } from "../../hooks/useVideoR
 import { GridWindow } from "../../types/GridWindow";
 import { assertNever } from "../../utils/assertNever";
 
+// Events with only main feeds (F1 Live and/or International), e.g. weekend warm-ups or shows
+export const isSingleStreamEvent = (streams: StreamsStateStreamsData) =>
+  streams.defaultStreams.length > 0 &&
+  streams.driverStreams.length === 0 &&
+  streams.driverTrackerStream == null &&
+  streams.dataChannelStream == null;
+
 export const getWindowStreamMap = (windows: GridWindow[], streams: StreamsStateStreamsData) => {
   return Object.fromEntries(
     windows.map((w) => {

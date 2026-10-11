@@ -4,9 +4,11 @@ import { withAs } from "../../utils/withAs";
 import { IconComponent } from "../../types/Icon";
 import styles from "./Button.module.scss";
 
+export type ButtonVariant = "Primary" | "Secondary" | "SecondaryInverted" | "Tertiary";
+
 interface ButtonProps {
   children?: ReactNode;
-  variant?: "Primary" | "Secondary" | "SecondaryInverted" | "Tertiary";
+  variant?: ButtonVariant;
   size?: "Default" | "Action";
   fluid?: boolean;
   disabledState?: boolean;

@@ -5,7 +5,7 @@ import {
   ArrowsPointingOutIcon,
 } from "@heroicons/react/20/solid";
 import classNames from "classnames";
-import { useState, useEffect, useCallback } from "react";
+import { ReactNode, useState, useEffect, useCallback } from "react";
 import whatInput from "what-input";
 import { Button } from "../../../Button/Button";
 import { toggleFullScreen } from "../../../../utils/toggleFullScreen";
@@ -21,8 +21,9 @@ interface OptionsButtonsProps {
   setVolume: (newVolume: number) => void;
   isMuted: boolean;
   setIsMuted: (newIsMuted: boolean) => void;
+  extraControls?: ReactNode;
 }
-export const OptionsButtons = ({ volume, setVolume, isMuted, setIsMuted }: OptionsButtonsProps) => {
+export const OptionsButtons = ({ volume, setVolume, isMuted, setIsMuted, extraControls }: OptionsButtonsProps) => {
   const [isFullScreen, setIsFullScreen] = useState(document.fullscreenElement != null);
   useEffect(() => {
     const onFullScreenChange = () => {
@@ -37,6 +38,7 @@ export const OptionsButtons = ({ volume, setVolume, isMuted, setIsMuted }: Optio
   return (
     <div className={styles.buttonsWrapper}>
       <VolumeButton volume={volume} setVolume={setVolume} isMuted={isMuted} setIsMuted={setIsMuted} />
+      {extraControls}
       <Button
         iconLeft={isFullScreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
         variant="Tertiary"

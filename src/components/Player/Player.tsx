@@ -1,16 +1,16 @@
 import classNames from "classnames";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RaceInfo } from "../../hooks/useVideoRaceDetails/useVideoRaceDetails.types";
-import { useViewerUIVisibility } from "../../hooks/useViewerUIVisibility/useViewerUIVisibility";
-import { GridWindow } from "../../types/GridWindow";
-import { Dimensions } from "../../types/Dimensions";
+import {
+  useViewerUIVisibility,
+  ViewerUIVisibilityContext,
+} from "../../hooks/useViewerUIVisibility/useViewerUIVisibility";
 import { DoubleEllipsisIcon } from "../CustomIcons/CustomIcons";
-import { WindowGridState } from "../../views/Viewer/hooks/useViewerState/useViewerState.utils";
 import { VideoPlayerRef } from "../VideoPlayer/VideoPlayer.types";
 import { PlayerControls } from "./PlayerControls/PlayerControls";
 import styles from "./Player.module.scss";
 import { PlayerRaceInfo } from "./PlayerRaceInfo/PlayerRaceInfo";
-import { LayoutButtons } from "./LayoutButtons/LayoutButtons";
+import { LayoutButtons, LayoutButtonsProps } from "./LayoutButtons/LayoutButtons";
 import { usePlayerDrag } from "./hooks/usePlayerDrag";
 import { PLAYER_COLLAPSED_ZONE_WHEN_COLLAPSED, PLAYER_COLLAPSED_ZONE_WHEN_OPEN } from "./Player.constants";
 
@@ -21,15 +21,9 @@ interface PlayerProps {
   setVolume: (newVolume: number) => void;
   isMuted: boolean;
   setIsMuted: (newIsMuted: boolean) => void;
-  usedWindows: string[];
-  createWindow: (newWindow: GridWindow, dimensions: Dimensions) => void;
-  loadLayout: (selectedLayoutIndex: number) => void;
-  duplicateLayout: (layoutIndex: number, name: string) => void;
-  renameLayout: (layoutIndex: number, name: string) => void;
-  deleteLayout: (layoutIndex: number) => void;
-  viewerState: WindowGridState;
   isPaused: boolean;
-  hasUsedAllStreams: boolean;
+  layoutControls?: LayoutButtonsProps;
+  extraControls?: ReactNode;
 }
 export const Player = ({
   player,
@@ -38,15 +32,9 @@ export const Player = ({
   volume,
   isMuted,
   setIsMuted,
-  usedWindows,
-  createWindow,
-  loadLayout,
-  duplicateLayout,
-  renameLayout,
-  deleteLayout,
-  viewerState,
   isPaused,
-  hasUsedAllStreams,
+  layoutControls,
+  extraControls,
 }: PlayerProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -80,16 +68,43 @@ export const Player = ({
     playerCollapsedZone: isCollapsed ? PLAYER_COLLAPSED_ZONE_WHEN_COLLAPSED : PLAYER_COLLAPSED_ZONE_WHEN_OPEN,
   });
 
+  // preventHiding is last-writer-wins, so controls inside the bar (e.g. dropdowns calling preventHiding(false)
+  // on close) must not release the bar's own hold while it's hovered, paused or dragged.
+  const holdsRef = useRef({ isHovered: false, isPaused, isDragging, isChildHolding: false });
+  const updatePreventHiding = useCallback(() => {
+    const { isHovered, isPaused, isDragging, isChildHolding } = holdsRef.current;
+    preventHiding(isHovered || isPaused || isDragging || isChildHolding);
+  }, [preventHiding]);
+
   useEffect(() => {
-    preventHiding(isPaused || isDragging);
-  }, [isPaused, preventHiding, isDragging]);
+    holdsRef.current.isPaused = isPaused;
+    holdsRef.current.isDragging = isDragging;
+    updatePreventHiding();
+  }, [isPaused, isDragging, updatePreventHiding]);
+
+  const childrenUIVisibility = useMemo(
+    () => ({
+      isUIVisible,
+      preventHiding: (shouldPrevent: boolean) => {
+        holdsRef.current.isChildHolding = shouldPrevent;
+        updatePreventHiding();
+      },
+    }),
+    [isUIVisible, updatePreventHiding],
+  );
 
   return (
-    <>
+    <ViewerUIVisibilityContext.Provider value={childrenUIVisibility}>
       {isDragging && <div className={styles.grabbingWrapper} />}
       <div
-        onMouseEnter={() => preventHiding(true)}
-        onMouseLeave={() => preventHiding(isPaused || isDragging)}
+        onMouseEnter={() => {
+          holdsRef.current.isHovered = true;
+          updatePreventHiding();
+        }}
+        onMouseLeave={() => {
+          holdsRef.current.isHovered = false;
+          updatePreventHiding();
+        }}
         className={classNames(styles.wrapper, {
           [styles.isCollapsed]: isCollapsed,
           [styles.isVisible]: isUIVisible,
@@ -125,30 +140,27 @@ export const Player = ({
             <PlayerRaceInfo raceInfo={raceInfo} />
           </div>
           <div className={classNames(styles.section, styles.middle)}>
-            {player != null && (
+            {player != null ? (
               <PlayerControls
                 playerRef={player}
                 setVolume={setVolume}
                 volume={volume}
                 isMuted={isMuted}
                 setIsMuted={setIsMuted}
+                extraControls={extraControls}
               />
+            ) : (
+              // Keep extra controls (e.g. feed switcher) reachable while there's no player, e.g. when a feed fails
+              extraControls != null && <div className={styles.extraControlsWithoutPlayer}>{extraControls}</div>
             )}
           </div>
-          <div className={styles.section}>
-            <LayoutButtons
-              usedWindows={usedWindows}
-              createWindow={createWindow}
-              viewerState={viewerState}
-              loadLayout={loadLayout}
-              duplicateLayout={duplicateLayout}
-              renameLayout={renameLayout}
-              deleteLayout={deleteLayout}
-              hasUsedAllStreams={hasUsedAllStreams}
-            />
-          </div>
+          {layoutControls != null && (
+            <div className={styles.section}>
+              <LayoutButtons {...layoutControls} />
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </ViewerUIVisibilityContext.Provider>
   );
 };
